@@ -1,11 +1,11 @@
 %  spec.tex
 %  Document created by seblovett on seblovett-NETBOOK
 %  Date created: Fri 18 Apr 2014 19:50:22 BST
-%  <+Last Edited: Fri 18 Apr 2014 20:29:40 BST by seblovett on seblovett-NETBOOK +>
+%  <+Last Edited: Fri 18 Apr 2014 20:42:53 BST by seblovett on seblovett-Ubuntu +>
 
 \documentclass[12pt]{article}
 
-%\usepackage[nodayofweek]{datetime}
+\usepackage[nodayofweek]{datetime}
 \usepackage{listings}
 \author{Henry Lovett, Sam Hooper}
 
@@ -85,9 +85,10 @@ A ``My Car Is Stolen'' button could be implemented to heighten the sleep poll ra
 A webpage will be used to send data to via a query string. 
 The query string should be of the form:
 
-\begin{listing}
+\begin{lstlisting}
 www.url.co.uk/interface.php?uid=01\&lat=0.01\&long=-0.01
-\end{listing}
+\end{lstlisting}
+
 The interface.php webpage should report ``OK'' if the query string is well formed and the UID is recognised. 
 Else, ``ER'' should be returned. 
 The text should be plain text and not HTML formatted.
@@ -97,18 +98,22 @@ The text should be plain text and not HTML formatted.
 A webpage will be used to configure the device.
 The page will be accessed with a query string of the device as follows:
 
+\begin{lstlisting}
 www.url.co.uk/options.php?uid=01
+\end{lstlisting}
 
 The page should look up the configuration from a database and return plain text in the following format:
 
+\begin{lstlisting}
 OPTION=1
-
+\end{lstlisting}
 For example:
 
-WAKE\_PERIOD=2
-SLEEP\_PERIOD=60
-MOVE\_THRESH=100
-
+\begin{lstlisting}
+WAKE_PERIOD=2
+SLEEP_PERIOD=60
+MOVE_THRESH=100
+\end{lstlisting}
 
 Exact option names and units of the values are TBC. 
 
