@@ -1,0 +1,117 @@
+%  spec.tex
+%  Document created by seblovett on seblovett-NETBOOK
+%  Date created: Fri 18 Apr 2014 19:50:22 BST
+%  <+Last Edited: Fri 18 Apr 2014 20:29:40 BST by seblovett on seblovett-NETBOOK +>
+
+\documentclass[12pt]{article}
+
+%\usepackage[nodayofweek]{datetime}
+\usepackage{listings}
+\author{Henry Lovett, Sam Hooper}
+
+\title{Car Track Specification}
+
+\begin{document}
+\maketitle
+
+%\begin{abstract}
+%Abstract
+%\end{abstract}
+
+\section{Introduction}
+
+This project is about creating a module capable of remotely tracking a car. 
+The module is capable of acquiring and reporting a location to a website. 
+
+\section{Specification}
+The following are the main goals:
+
+\begin{enumerate}
+\item Be able to report the location of the car to a website. 
+\item Website shows past and current location of the car.
+\item Hardware device uses GPS to acquire location and GSM to send data to a website.
+\item Hardware must be able to send data irrespective of whether the car is running.
+\item Hardware is capable of being configured by a user via the website.
+\end{enumerate}
+
+\section{Hardware Device}
+
+The hardware is to be a module with a GPS and GSM modem. 
+It is to be powered by the car battery. 
+LiPo battery could be used, but the current draw should be low enough to not impact the main battery. 
+It will be concealed in the car.
+
+\subsection{Specification}
+
+\begin{enumerate}
+\item Device should be able to acquire location to within an acceptable accuracy
+\item Device can send data over an internet GSM connection
+\item Module should have a distance threshold. Once the threshold is passed, the new location is reported.
+\item During sleep mode, GSM should be disabled to save battery. Website should be polled to check for option updates. GPS should be polled to check the car hasn't moved.
+\end{enumerate}
+
+
+\subsection{Costings}
+The below is an approximate costings for one module. 
+
+\begin{table}[!h]
+\begin{tabular}{ccc}
+Item		&	Quantity	& 	Cost (\pounds) \\ \hline
+Qualtec M10 GSM & 	1		& 	15.00 \\
+MTK3339 GPS	&	1		&	10.00 \\
+Atmega 644P QFP & 	1		&	6.00  \\
+PCB (10cm by 10cm)&	10		&	20.00 \\
+Other passives	&	N/A		&	5.00 \\ \hline
+TOTAL		&	1		&	56 \\ \hline
+TOTAL 		&	2		&	87 \\ \hline
+\end{tabular}
+\end{table}
+
+
+\section{Website}
+
+Website should be able to show the locations for a car. 
+Log in and user should be supported. 
+A module should be able to be configured with options.
+A ``My Car Is Stolen'' button could be implemented to heighten the sleep poll rate. 
+
+\section{Interface}
+
+``Sending'' data is the moving of information from the module to the server.
+``Receiving'' data is the moving of information from the server to the module.
+
+\subsection{Sending Data}
+
+A webpage will be used to send data to via a query string. 
+The query string should be of the form:
+
+\begin{listing}
+www.url.co.uk/interface.php?uid=01\&lat=0.01\&long=-0.01
+\end{listing}
+The interface.php webpage should report ``OK'' if the query string is well formed and the UID is recognised. 
+Else, ``ER'' should be returned. 
+The text should be plain text and not HTML formatted.
+
+\subsection{Receiving Data}
+
+A webpage will be used to configure the device.
+The page will be accessed with a query string of the device as follows:
+
+www.url.co.uk/options.php?uid=01
+
+The page should look up the configuration from a database and return plain text in the following format:
+
+OPTION=1
+
+For example:
+
+WAKE\_PERIOD=2
+SLEEP\_PERIOD=60
+MOVE\_THRESH=100
+
+
+Exact option names and units of the values are TBC. 
+
+
+\end{document}
+
