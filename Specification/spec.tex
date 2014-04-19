@@ -1,7 +1,7 @@
 %  spec.tex
 %  Document created by seblovett on seblovett-NETBOOK
 %  Date created: Fri 18 Apr 2014 19:50:22 BST
-%  <+Last Edited: Fri 18 Apr 2014 20:42:53 BST by seblovett on seblovett-Ubuntu +>
+%  <+Last Edited: Sat 19 Apr 2014 12:22:16 BST by seblovett on seblovett-Ubuntu +>
 
 \documentclass[12pt]{article}
 
@@ -48,6 +48,7 @@ It will be concealed in the car.
 \item Device can send data over an internet GSM connection
 \item Module should have a distance threshold. Once the threshold is passed, the new location is reported.
 \item During sleep mode, GSM should be disabled to save battery. Website should be polled to check for option updates. GPS should be polled to check the car hasn't moved.
+\item Device should report to website when low on credit (if PAYG SIM card is used)
 \end{enumerate}
 
 
@@ -73,7 +74,8 @@ TOTAL 		&	2		&	87 \\ \hline
 Website should be able to show the locations for a car. 
 Log in and user should be supported. 
 A module should be able to be configured with options.
-A ``My Car Is Stolen'' button could be implemented to heighten the sleep poll rate. 
+A ``My Car Is Stolen'' button could be implemented to heighten the sleep poll rate.
+Be able to send an alert if the credit is low. 
 
 \section{Interface}
 
@@ -86,12 +88,13 @@ A webpage will be used to send data to via a query string.
 The query string should be of the form:
 
 \begin{lstlisting}
-www.url.co.uk/interface.php?uid=01\&lat=0.01\&long=-0.01
+www.url.co.uk/interface.php?uid=01&lat=0.01&long=-0.01&credit=1.01
 \end{lstlisting}
 
 The interface.php webpage should report ``OK'' if the query string is well formed and the UID is recognised. 
 Else, ``ER'' should be returned. 
 The text should be plain text and not HTML formatted.
+Credit reporting is optional. 
 
 \subsection{Receiving Data}
 
