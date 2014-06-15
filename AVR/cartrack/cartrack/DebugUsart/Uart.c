@@ -8,7 +8,7 @@
 
 #include "Uart.h"
 
-
+///@todo - make this more generic
 void Uart_Init(void)
 {
 	cli();

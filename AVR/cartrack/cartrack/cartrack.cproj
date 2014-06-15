@@ -109,13 +109,25 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="cartrack.c">
+    <Compile Include="GSM\GSM.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="DebugUsart\Uart.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="DebugUsart\Uart.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GSM\GSM.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GSM\Interface.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GSM\Interface.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
