@@ -1,3 +1,5 @@
 #EAGLE temp files
 *.b#*
 *.s#*
+
+AVR/cartrack/cartrack/Debug
