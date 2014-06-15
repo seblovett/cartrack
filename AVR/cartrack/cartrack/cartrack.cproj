@@ -109,6 +109,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="GSM\AT.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GSM\AT.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="GSM\GSM.c">
       <SubType>compile</SubType>
     </Compile>

@@ -8,16 +8,25 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdio.h>
+#include <util/delay.h>
 
 #ifndef INTERFACE_H_
 #define INTERFACE_H_
 
 #define CIRBUF_SIZE 128
 
+//power pin config
+#define PWR_DDR		DDRD
+#define PWR_PORT	PORTD
+#define PWR_PIN		PD4
+
 void Interface_SendString(char *s);
 void Interface_SendChar(uint8_t c);
 void Interface_Init(void);
 void Dump_Buf(void);
+void Pulse_Power(void);
+
+
 // could implement an overflow?
 typedef struct  {
 	uint8_t ReadPtr;
@@ -63,6 +72,37 @@ __inline__ uint8_t Circ_Read_Char()
 		else
 			return circBuf.Buffer[circBuf.ReadPtr++];
 	}
+}
+
+
+uint8_t Circ_Count(void);
+// //__inline__ uint8_t Circ_Count()
+// {
+// 	uint8_t retval;
+// 	if (circBuf.ReadPtr <= circBuf.WritePtr) //not wrapped
+// 		retval = circBuf.WritePtr - circBuf.ReadPtr; //return the diff
+// 	else
+// 		retval = (circBuf.WritePtr + (CIRBUF_SIZE - circBuf.ReadPtr)); //if it is wrapped
+// 	return retval;
+// }
+
+__inline__ void Timer_start(void)
+{
+	TCNT1 = 0x0000; //reset timer
+	TIFR1 |= (1 << TOV1); //clear overflow flag
+	TCCR1B = (1 << CS02) | (1 << CS00);
+}
+
+__inline__ void Timer_stop(void)
+{
+	TCNT1 = 0x0000; //reset timer
+	TIFR1 |= (1 << TOV1); //clear overflow flag
+	TCCR1B = 0;//
+}
+
+__inline__ uint8_t Timer_Ovf(void)
+{
+	return (TIFR1 & (1 << TOV1)); //mask the timer overflow out
 }
 
 #endif /* INTERFACE_H_ */

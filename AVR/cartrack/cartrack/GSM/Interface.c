@@ -11,10 +11,15 @@
 void Interface_Init()
 {
 	cli();
+	//initialise the uart interface
 	UBRR1H = 0;
 	UBRR1L = 0x4d;
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE1); //enable rx and tx, also rx interrupt
 	UCSR1C = (1 << UCSZ11) | (1 << UCSZ10); // 8 data, 1 stop, 0 parity
+	
+	//init power pin
+	PWR_PORT &= ~(1 << PWR_PIN);
+	PWR_DDR |= (1 << PWR_PIN);
 	
 	//initialise the circular buffer
 	circBuf.ReadPtr = 0;
@@ -55,4 +60,22 @@ void Dump_Buf(void)
 			printf("%c", circBuf.Buffer[i]);
 	}
 	printf("\tWP=%d\tRP=%d", circBuf.WritePtr, circBuf.ReadPtr);
+}
+
+
+uint8_t Circ_Count(void)
+{
+	uint8_t retval;
+	if (circBuf.ReadPtr <= circBuf.WritePtr) //not wrapped
+		retval = circBuf.WritePtr - circBuf.ReadPtr; //return the diff
+	else
+		retval = (circBuf.WritePtr + (CIRBUF_SIZE - circBuf.ReadPtr)); //if it is wrapped
+	return retval;
+}
+
+void Pulse_Power(void)
+{
+	PWR_PORT |= (1 << PWR_PIN);
+	_delay_ms(500);
+	PWR_PORT &= ~(1 << PWR_PIN);
 }

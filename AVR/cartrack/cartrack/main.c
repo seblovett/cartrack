@@ -17,7 +17,7 @@ int main(void)
 {
 	DDRB = 0x80;
 	Uart_Init();
-	printf("Car Track AVR\n\r");
+	printf("\n\n\rCar Track AVR\n\r");
 	GSM_Init();
     while(1)
     { 
