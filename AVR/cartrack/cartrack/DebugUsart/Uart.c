@@ -7,7 +7,7 @@
  */
 
 #include "Uart.h"
-
+#include "../GSM/Interface.h"
 ///@todo - make this more generic
 void Uart_Init(void)
 {
@@ -31,9 +31,16 @@ void Uart_SendChar(uint8_t c)
 ISR(USART0_RX_vect)
 {
 	uint8_t c = UDR0;
-	Uart_SendChar(c);//echo back
-	if (c == '\r')
-		Uart_SendChar('\n');
+	Interface_SendChar(c);//echo to GSM
+	//if (c == '\r')
+	//	Interface_SendChar('\n');
+	if (c == 2)
+	{
+		circBuf.WritePtr = 0; //reset ptr
+		circBuf.ReadPtr = 0;
+		for (c = 0; c < CIRBUF_SIZE; c++)
+			circBuf.Buffer[c] = 0;
+	}
 }
 
 void Uart_SendString(char *s)

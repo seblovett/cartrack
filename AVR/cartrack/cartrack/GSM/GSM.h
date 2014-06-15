@@ -11,9 +11,12 @@
 #ifndef GSM_H_
 #define GSM_H_
 
+
+
+
 uint8_t GSM_Init(void);
 
 uint8_t GSM_Proc(void);
-
-
+void GPRS_Setup();
+void GPRS_Send(void);
 #endif /* GSM_H_ */

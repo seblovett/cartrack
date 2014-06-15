@@ -49,14 +49,14 @@ void Interface_SendString(char *s)
 
 void Dump_Buf(void)
 {
-	printf("\r\n");
+	printf("\r                                                 \r");
 	for (uint8_t i = 0; i < CIRBUF_SIZE; i++)
 	{
-		if ( circBuf.Buffer[i] == '\r')
-			printf("\\r");
-		else if ( circBuf.Buffer[i] == '\n')
-			printf("\\n");
-		else 
+// 		if ( circBuf.Buffer[i] == '\r')
+// 			printf("\\r");
+// 		else if ( circBuf.Buffer[i] == '\n')
+// 			printf("\\n");
+// 		else 
 			printf("%c", circBuf.Buffer[i]);
 	}
 	printf("\tWP=%d\tRP=%d", circBuf.WritePtr, circBuf.ReadPtr);

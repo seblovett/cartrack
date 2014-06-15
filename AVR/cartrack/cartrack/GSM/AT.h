@@ -11,10 +11,23 @@
 #define AT_H_
 
 
-#define AT_TIMEOUT 1
-#define AT_SUCCESS 0
+#define AT_TIMEOUT	1
+#define AT_SUCCESS	0
+#define AT_ERROR	2
+
 uint8_t AT_OK(void);
-
-
-
+uint8_t ATE(uint8_t Echo);
+uint8_t ATV(uint8_t val);
+uint8_t ATaF(void);
+uint8_t ATCSQ(void);
+uint8_t AT_CGATT(uint8_t val);
+uint8_t AT_QIREGAPP(void);
+uint8_t AT_QICSGP(void);
+uint8_t AT_QISHOWRA(uint8_t val);
+uint8_t AT_QIDNSIP(uint8_t val);
+uint8_t AT_QIFGCNT(uint8_t val);
+uint8_t AT_QILOCIP(void);
+uint8_t AT_QIACT(void);
+uint8_t AT_QISEND(void);
+uint8_t AT_QIOPEN(void);
 #endif /* AT_H_ */

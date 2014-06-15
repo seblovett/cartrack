@@ -19,10 +19,13 @@ int main(void)
 	Uart_Init();
 	printf("\n\n\rCar Track AVR\n\r");
 	GSM_Init();
+	_delay_ms(4000);
+	GPRS_Setup();
     while(1)
     { 
 		PORTB ^= 0x80;
 		GSM_Proc();
-		_delay_ms(500);
+		GPRS_Send();
+		_delay_ms(5000);
     }
 }

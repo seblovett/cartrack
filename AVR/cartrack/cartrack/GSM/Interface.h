@@ -13,7 +13,17 @@
 #ifndef INTERFACE_H_
 #define INTERFACE_H_
 
-#define CIRBUF_SIZE 128
+
+// APN data
+// With a Movilforum SIM:
+// It can be "bluevia.movistar.es" or "sm2ms.movilforum.es"
+#define GPRS_APN       "bluevia.movistar.es" // replace your GPRS APN
+#define GPRS_LOGIN     "seblovett@googlemail.com"    // replace with your GPRS login
+#define GPRS_PASSWORD  "milli2004" // replace with your GPRS password
+
+
+
+#define CIRBUF_SIZE 250
 
 //power pin config
 #define PWR_DDR		DDRD
@@ -25,6 +35,7 @@ void Interface_SendChar(uint8_t c);
 void Interface_Init(void);
 void Dump_Buf(void);
 void Pulse_Power(void);
+uint8_t Circ_Count(void);
 
 
 // could implement an overflow?
@@ -36,6 +47,37 @@ typedef struct  {
 
 CircularBuf_t circBuf;
 
+
+
+//GSM struct
+typedef struct {
+	uint8_t status; // | Power | Res(3) | Status (4) |
+	uint8_t config; // | Res(6) | ATV | ATE |
+	uint8_t signal; // contains signal level
+	uint8_t gprs; // | res(7) | attached |
+	} GSM_t;
+
+GSM_t gsm;
+
+//defines
+#define GSM_STATUS_POWER	0x80
+#define GSM_STATUS_MASK		0x0F
+#define GSM_STATUS_OFFSET	0x00
+#define GSM_STATUS_OK			0x00
+#define GSM_STATUS_CONNECT		0x01
+#define GSM_STATUS_RING			0x02
+#define GSM_STATUS_NOCAR		0x03
+#define GSM_STATUS_ERROR		0x04
+#define GSM_STATUS_NODIAL		0x06
+#define GSM_STATUS_BUSY			0x07
+#define GSM_STATUS_NOANS		0x08
+#define GSM_STATUS_PROC			0x09
+
+#define GSM_CONFIG_ECHO		0x01
+#define GSM_CONFIG_ATV		0x02
+
+#define GSM_GPRS_ATTACHED	0x01
+//inline functions
 __inline__ void Circ_Write_Char(uint8_t c)
 {
 	//check if full
@@ -75,16 +117,7 @@ __inline__ uint8_t Circ_Read_Char()
 }
 
 
-uint8_t Circ_Count(void);
-// //__inline__ uint8_t Circ_Count()
-// {
-// 	uint8_t retval;
-// 	if (circBuf.ReadPtr <= circBuf.WritePtr) //not wrapped
-// 		retval = circBuf.WritePtr - circBuf.ReadPtr; //return the diff
-// 	else
-// 		retval = (circBuf.WritePtr + (CIRBUF_SIZE - circBuf.ReadPtr)); //if it is wrapped
-// 	return retval;
-// }
+
 
 __inline__ void Timer_start(void)
 {
