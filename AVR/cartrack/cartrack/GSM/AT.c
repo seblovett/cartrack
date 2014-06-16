@@ -509,7 +509,7 @@ uint8_t AT_QIREGAPP(void)
 #ifdef DEBUG
 	printf("Sending AT+QIREGAPP=\"apn\",\"user\",\"pswd\"");
 #endif
-	Interface_SendString("AT+QIREGAPP=\"bluevia.movistar.es\",\"seblovett@googlemail.com\",\"milli2004\"\r"); //pp.vodafone.co.uk\",\"web\",\"web\"\r");
+	Interface_SendString("AT+QIREGAPP=\"bluevia.movistar.es\",\"\",\"\"\r"); //pp.vodafone.co.uk\",\"web\",\"web\"\r");
 // 	Interface_SendString(GPRS_APN);
 // 	Interface_SendString("\",\"");
 // 	Interface_SendString(GPRS_LOGIN);
