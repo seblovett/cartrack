@@ -19416,7 +19416,9 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <sheets>
 <sheet>
 <plain>
-<text x="12.7" y="-25.4" size="6.4516" layer="97">NEED TO PUT DECOUPLING CAPACITORS ON</text>
+<text x="20.32" y="-45.72" size="6.4516" layer="97">TO DO:
+Decoupling capacitors
+GSM Antenna</text>
 </plain>
 <instances>
 <instance part="U$1" gate="G$1" x="48.26" y="40.64"/>
@@ -20326,4 +20328,10 @@ You are welcome to use this library for commercial purposes. For attribution, we
 </errors>
 </schematic>
 </drawing>
+<compatibility>
+<note version="6.3" minversion="6.2.2" severity="warning">
+Since Version 6.2.2 text objects can contain more than one line,
+which will not be processed correctly with this version.
+</note>
+</compatibility>
 </eagle>
