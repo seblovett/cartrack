@@ -14,13 +14,6 @@
 #define INTERFACE_H_
 
 
-// APN data
-// With a Movilforum SIM:
-// It can be "bluevia.movistar.es" or "sm2ms.movilforum.es"
-#define GPRS_APN       "bluevia.movistar.es" // replace your GPRS APN
-#define GPRS_LOGIN     "seblovett@googlemail.com"    // replace with your GPRS login
-#define GPRS_PASSWORD  "milli2004" // replace with your GPRS password
-
 
 
 #define CIRBUF_SIZE 250
