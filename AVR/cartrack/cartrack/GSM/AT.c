@@ -3,13 +3,20 @@
  *  Date Created: Sun 15 Jun 2014 13:59:30 BST by seblovett on seblovett-Ubuntu
  *  <+Last Edited: Sun 15 Jun 2014 14:01:45 BST by seblovett on seblovett-Ubuntu +>
  *  @author seblovett
- *  @brief ...
+ *  @brief Collection of AT commands implemented.
  */
 
 #include "AT.h"
 #include <stdlib.h>
 
-uint8_t ParseReceived()
+/** \defgroup parsers "Parse and Wait Functions" */
+/* @{ */
+/**	@brief Parses received data in the circular buffer
+ *  retval AT_SUCCESS, AT_ERROR
+ *	Checks for the following strings - OK, CONNECT, RING, NO CARRIER, ERROR, NO DIALTONE, BUSY, NO ANSWER, PROCEEDING, NORMAL POWER DOWN.
+ *	If one of these is found, it is stored in GSM_t.status lower nibble
+ */
+uint8_t ParseReceived(void)
 {
 	uint8_t rp, i;
 	if(Circ_Count()) //if we have received data
@@ -167,10 +174,14 @@ uint8_t ParseReceived()
 	return AT_ERROR;
 }
 
+/** @brief Manages the timeout of the GSM modem
+ *	retval AT_SUCCESS, AT_ERROR, AT_TIMEOUT
+ *	Starts the timer. Continuously calls ParseReceived(). 
+ *	If ParseReceived() finds a string, the GSM_t.status is checked for the status and value returned depends on this.
+ *	If timer overflows before a valid string is received, AT_TIMEOUT is returned.
+ */
 uint8_t WaitOK(void)
 {
-	//uint8_t rp, i;
-	//start timer
 	Timer_start();
 	while(0 == Timer_Ovf())
 	{
@@ -190,7 +201,13 @@ uint8_t WaitOK(void)
 	Timer_stop();
 	return AT_TIMEOUT;
 }
-/** @brief ATOK
+
+/* @} */
+
+/** \defgroup at "Basic AT commands" */
+/* @{ */
+	
+/** @brief Sends "AT". Expects "OK" back
  */
 uint8_t AT_OK(void)
 {
@@ -200,30 +217,33 @@ uint8_t AT_OK(void)
 #endif
 
 	Interface_SendString("AT\n\r");
+#ifdef DEBUG
 	switch (WaitOK())
 	{
 		case AT_SUCCESS:
-			#ifdef DEBUG
 			printf("\tSuccess\n\r");
-			#endif
 			return AT_SUCCESS;
 		
 		case AT_TIMEOUT:
-			#ifdef DEBUG
 			printf("\tTimeout\n\r");
-			#endif
 			return AT_TIMEOUT;
 		
 		default:
 		case AT_ERROR:
-			#ifdef DEBUG
 			printf("\tError\n\r");
-			#endif
 			return AT_ERROR;
 	}
+#else
+	return WaitOK();
+#endif
 }
 
 
+/** @brief Sets the echo status of the modem
+ *	@param val - 0 : off, 1 : on
+ *	@retval AT_SUCCESS, AT_ERROR, AT_TIMEOUT
+ *	Sends ATE<0/1>. If successful, the relevant bit in GSM_t.config is set / cleared
+ */
 uint8_t ATE(uint8_t val)
 {
 	if (val > 1)
@@ -243,7 +263,7 @@ uint8_t ATE(uint8_t val)
 		gsm.config |= GSM_CONFIG_ECHO;
 	else
 		gsm.config &= ~(GSM_CONFIG_ECHO); //zero the config bit
-			
+		
 	switch (WaitOK())
 	{
 		case AT_SUCCESS:
@@ -275,8 +295,15 @@ uint8_t ATE(uint8_t val)
 				gsm.config |= (GSM_CONFIG_ECHO); //zero the config bit
 			return AT_ERROR;
 	}
+
 }
 
+
+/** @brief Sets the verbose status of the modem
+ *	@param val - 0 : off, 1 : on
+ *	@retval AT_SUCCESS, AT_ERROR, AT_TIMEOUT
+ *	Sends ATV<0/1>. If successful, the relevant bit in GSM_t.config is set / cleared
+ */
 uint8_t ATV(uint8_t val)
 {
 	if (val > 1)
@@ -331,6 +358,10 @@ uint8_t ATV(uint8_t val)
 	}
 }
 
+/** @brief Resets the modem.
+ *	@retval AT_SUCCESS, AT_ERROR, AT_TIMEOUT
+ *	Sends AT&F - resets all settings to factory defaults.
+ */
 uint8_t ATaF(void)
 {
 	#ifdef DEBUG
@@ -361,6 +392,10 @@ uint8_t ATaF(void)
 	}
 }
 
+/** @brief Gets the signal status of the modem
+ *	@retval AT_SUCCESS, AT_ERROR, AT_TIMEOUT
+ *	Sends AT+CSQ. Parses the output for a numerical signal value and stores in GSM_t.signal.
+ */
 uint8_t ATCSQ(void)
 {
 	uint8_t rp = circBuf.ReadPtr; //store the read pointer
@@ -380,7 +415,6 @@ uint8_t ATCSQ(void)
 				;
 			//convert it to int
 			rp = atoi((char *)(circBuf.Buffer + rp));
-			//printf("Signal = %d", rp);
 			//store it in struct
 			gsm.signal = rp;
 			return AT_SUCCESS;
@@ -400,46 +434,55 @@ uint8_t ATCSQ(void)
 	}
 }
 
-
+/** @brief Turns off the modem.
+ *	@retval AT_SUCCESS, AT_ERROR, AT_TIMEOUT
+ *	Sends AT+QPOWD. Bit is cleared in GSM_t.status by ParseReceived().
+ */
 uint8_t ATQPOWD (void)
 {
 		#ifdef DEBUG
 	printf("Sending AT+QPOWD");
 	#endif
 	Interface_SendString("AT+QPOWD\n\r");
-			
+#ifdef DEBUG			
 	switch (WaitOK())
 	{
 		case AT_SUCCESS:
-			#ifdef DEBUG
 			printf("\tSuccess\n\r");
-			#endif
 			return AT_SUCCESS;
 		
 		case AT_TIMEOUT:
-			#ifdef DEBUG
 			printf("\tTimeout\n\r");
-			#endif
 			return AT_TIMEOUT;
 		
 		default:
 		case AT_ERROR:
-			#ifdef DEBUG
 			printf("\tError\n\r");
-			#endif
 			return AT_ERROR;
 	}
+#else
+	return WaitOK();
+#endif
 }
 
+/* @} */
 
+
+/** \defgroup gprs "GPRS AT commands" */
+/* @{ */
 //GPRS Related commands
 
-//Attach to / detach from GPRS
+/** @brief Attach to / detach from GPRS
+ *	@param val - 0 : detach, 1 : attach
+ *	@retval AT_SUCCESS, AT_ERROR, AT_TIMEOUT
+ *	Sends AT+CGATT<0/1>. If successful, the relevant bit in GSM_t.gprs is set / cleared
+ *	Attempts to find the status from the modem beforehand.
+ */
 uint8_t AT_CGATT(uint8_t val)
 {
 	uint8_t rp = circBuf.ReadPtr;
 	//check if connected or not.
-	#ifdef DEBUG
+#ifdef DEBUG
 	printf("AT+CGATT?\n\r");
 #endif
 	Interface_SendString("AT+CGATT?\n\r");
@@ -504,42 +547,45 @@ uint8_t AT_CGATT(uint8_t val)
 }
 
 
+/** @brief Configures APN Details for the modem. 
+ *	@retval AT_SUCCESS, AT_ERROR, AT_TIMEOUT
+ *	Sends AT+QIREGAPP="GPRS_APN","user","password"
+ *	@todo - make this support more networks depending on the sim installed
+ */
 uint8_t AT_QIREGAPP(void)
 {
 #ifdef DEBUG
 	printf("Sending AT+QIREGAPP=\"apn\",\"user\",\"pswd\"");
 #endif
-	Interface_SendString("AT+QIREGAPP=\"bluevia.movistar.es\",\"\",\"\"\r"); //pp.vodafone.co.uk\",\"web\",\"web\"\r");
-// 	Interface_SendString(GPRS_APN);
-// 	Interface_SendString("\",\"");
-// 	Interface_SendString(GPRS_LOGIN);
-// 	Interface_SendString("\",\"");
-// 	Interface_SendString(GPRS_PASSWORD);
-// 	Interface_SendString("\"\r");
+	Interface_SendString("AT+QIREGAPP=\"");
+	Interface_SendString(GPRS_APN);
+	Interface_SendString("\",\"\",\"\"\r");
+
+#ifdef DEBUG
 	switch (WaitOK())
 	{
 		case AT_SUCCESS:
-			#ifdef DEBUG
 			printf("\tSuccess\n\r");
-			#endif
 			return AT_SUCCESS;
 		
 		case AT_TIMEOUT:
-			#ifdef DEBUG
 			printf("\tTimeout\n\r");
-			#endif
 			return AT_TIMEOUT;
 		
 		default:
 		case AT_ERROR:
-			#ifdef DEBUG
 			printf("\tError\n\r");
-			#endif
 			return AT_ERROR;
 	}
+#else
+	return WaitOK();
+#endif
 }
 
-
+/** @brief Activates GPRS
+ *	@retval AT_SUCCESS, AT_ERROR, AT_TIMEOUT
+ *	Sends AT+QIACT
+ */
 uint8_t AT_QIACT(void)
 {
 	#ifdef DEBUG
@@ -570,6 +616,11 @@ uint8_t AT_QIACT(void)
 	}
 }
 
+/** @brief Requests IP address for the GPRS connection.
+ *	@retval AT_ERROR
+ *	Sends AT+QILOCIP to request the IP address of the modem.
+ *	@todo - this AT command only returns the IP, not OK. This method currently always fails. IP address is not stored either.
+ */
 uint8_t AT_QILOCIP(void)
 {
 		#ifdef DEBUG
@@ -600,15 +651,16 @@ uint8_t AT_QILOCIP(void)
 	}
 }
 
-
+/** @brief Sets the foreground context
+ *	@param val - context to use (see datasheet)
+ *	@retval AT_SUCCESS, AT_ERROR, AT_TIMEOUT
+ *	Sends AT+CGATT<val>.
+ */
 uint8_t AT_QIFGCNT(uint8_t val)
 {
-	if (val > 1)
-		val = 1; //limit it to one
-		
-	#ifdef DEBUG
+#ifdef DEBUG
 	printf("Sending AT+QIFGCNT=%d", val);
-	#endif
+#endif
 	Interface_SendString("AT+QIFGCNT=");
 	if (val)
 		Interface_SendString("1");
@@ -640,6 +692,10 @@ uint8_t AT_QIFGCNT(uint8_t val)
 	}
 }
 
+/** @brief Selects the GPRS bearer
+ *	@retval AT_SUCCESS, AT_ERROR, AT_TIMEOUT
+ *	Sends AT+QICSGP="GPRS_APN"
+ */
 uint8_t AT_QICSGP(void)
 {
 
@@ -650,196 +706,199 @@ uint8_t AT_QICSGP(void)
 	Interface_SendString(GPRS_APN);
 	Interface_SendString("\"\r\n");
 			
+#ifdef DEBUG
 	switch (WaitOK())
 	{
 		case AT_SUCCESS:
-			#ifdef DEBUG
 			printf("\tSuccess\n\r");
-			#endif
 			return AT_SUCCESS;
 		
 		case AT_TIMEOUT:
-			#ifdef DEBUG
 			printf("\tTimeout\n\r");
-			#endif
-			//revert the bit change
 			return AT_TIMEOUT;
 		
 		default:
 		case AT_ERROR:
-			#ifdef DEBUG
 			printf("\tError\n\r");
-			#endif
 			return AT_ERROR;
 	}
+#else
+	return WaitOK();
+#endif
 }
 
 
-
+/** @brief Connect with IP or Domain name
+ *	@param val - 0 : Use IP address, 1 : use domain name
+ *	@retval AT_SUCCESS, AT_ERROR, AT_TIMEOUT
+ *	Sends AT+QIDNSIP<0/1>.
+ *	val is limited to 1
+ */
 uint8_t AT_QIDNSIP(uint8_t val)
 {
 	if (val > 1)
 		val = 1; //limit it to one
 		
-	#ifdef DEBUG
+#ifdef DEBUG
 	printf("Sending AT+QIDNSIP=%d", val);
-	#endif
+#endif
 	Interface_SendString("AT+QIDNSIP=");
 	if (val)
 		Interface_SendString("1");
 	else
 		Interface_SendString("0");
 	Interface_SendString("\r\n");
-			
+
+#ifdef DEBUG	
 	switch (WaitOK())
 	{
 		case AT_SUCCESS:
-			#ifdef DEBUG
 			printf("\tSuccess\n\r");
-			#endif
 			return AT_SUCCESS;
 		
 		case AT_TIMEOUT:
-			#ifdef DEBUG
 			printf("\tTimeout\n\r");
-			#endif
-			//revert the bit change
 			return AT_TIMEOUT;
 		
 		default:
 		case AT_ERROR:
-			#ifdef DEBUG
 			printf("\tError\n\r");
-			#endif
 			return AT_ERROR;
 	}
+#else
+	return WaitOK();
+#endif
 }
 
+/** @brief Set whether to display the address of sender
+ *	@param val - 0 : Don not show, 1 : Show
+ *	@retval AT_SUCCESS, AT_ERROR, AT_TIMEOUT
+ *	Sends AT+QISHOWRA<0/1>.
+ *	val is limited to 1
+ */
 uint8_t AT_QISHOWRA(uint8_t val)
 {
 	if (val > 1)
 		val = 1; //limit it to one
 		
-	#ifdef DEBUG
+#ifdef DEBUG
 	printf("Sending AT+QISHOWRA=%d", val);
-	#endif
+#endif
 	Interface_SendString("AT+QISHOWRA=");
 	if (val)
 		Interface_SendString("1");
 	else
 		Interface_SendString("0");
 	Interface_SendString("\r\n");
-			
+	
+#ifdef DEBUG			
 	switch (WaitOK())
 	{
 		case AT_SUCCESS:
-			#ifdef DEBUG
 			printf("\tSuccess\n\r");
-			#endif
 			return AT_SUCCESS;
 		
 		case AT_TIMEOUT:
-			#ifdef DEBUG
 			printf("\tTimeout\n\r");
-			#endif
-			//revert the bit change
 			return AT_TIMEOUT;
 		
 		default:
 		case AT_ERROR:
-			#ifdef DEBUG
 			printf("\tError\n\r");
-			#endif
 			return AT_ERROR;
 	}
+#else
+	return WaitOK();
+#endif
 }
 
-
+/** @brief Opens a TCP connection
+ *	@retval AT_SUCCESS, AT_ERROR, AT_TIMEOUT
+ *  Sends AT+QIOPEN=\"TCP\",\"www.seblovett.co.uk\",80
+ *	@todo - need to make the webpage easily defined
+ */
 uint8_t AT_QIOPEN(void)
 {
 
-	#ifdef DEBUG
+#ifdef DEBUG
 	printf("Sending AT+QIOPEN=\"TCP\",\"www.seblovett.co.uk\",80");
-	#endif
+#endif
 	Interface_SendString("AT+QIOPEN=\"TCP\",\"www.seblovett.co.uk\",80\r");
+
+#ifdef DEBUG
 	switch (WaitOK())
 	{
 		case AT_SUCCESS:
-			#ifdef DEBUG
 			printf("\tSuccess\n\r");
-			#endif
 			break;
 		
 		case AT_TIMEOUT:
-			#ifdef DEBUG
 			printf("\tTimeout\n\r");
-			#endif
-			//revert the bit change
 			break;
 		
 		default:
 		case AT_ERROR:
-			#ifdef DEBUG
 			printf("\tError\n\r");
-			#endif
 			break;
 	}
 	switch (WaitOK())
 	{
 		case AT_SUCCESS:
-			#ifdef DEBUG
 			printf("\tSuccess\n\r");
-			#endif
 			return AT_SUCCESS;
 		
 		case AT_TIMEOUT:
-			#ifdef DEBUG
 			printf("\tTimeout\n\r");
-			#endif
-			//revert the bit change
 			return AT_TIMEOUT;
 		
 		default:
 		case AT_ERROR:
-			#ifdef DEBUG
 			printf("\tError\n\r");
-			#endif
 			return AT_ERROR;
 	}
+#else
+	//two okays are expected
+	WaitOK(); //one for the receipt of command
+	return WaitOK(); //one for the actual connection
+#endif
 }
 
 
-
+/** @brief Sends a HTTP packet to the destination server
+ *	@retval AT_SUCCESS, AT_ERROR, AT_TIMEOUT
+ *	Uses the QISEND command. A HTTP GET request is used to send data via a query string.
+ *	@todo implement the actual data sending, only dummy data is currently used
+ */
 uint8_t AT_QISEND(void)
 {
 
-	#ifdef DEBUG
+#ifdef DEBUG
 	printf("Sending AT+QISEND=\"TCP\",\"www.seblovett.co.uk\",80");
-	#endif
+#endif
 	Interface_SendString("AT+QISEND\r");//GET /submit.php?id=1&mb_fan_cpu=1000 HTTP/1.1\r\nHost: www.seblovett.co.uk\n\rConnection:close\r\n\n");
 	_delay_ms(1000);
 	Interface_SendString("GET /submit.php?id=1 HTTP/1.1\r\nHost: www.seblovett.co.uk\r\nConnection:close\r\n\n");
 	Interface_SendChar(0x1a); //CTRLZ
+#ifdef DEBUG
 	switch (WaitOK())
 	{
 		case AT_SUCCESS:
-			#ifdef DEBUG
 			printf("\tSuccess\n\r");
-			#endif
 			return AT_SUCCESS;
 		
 		case AT_TIMEOUT:
-			#ifdef DEBUG
 			printf("\tTimeout\n\r");
-			#endif
-			//revert the bit change
 			return AT_TIMEOUT;
 		
 		default:
 		case AT_ERROR:
-			#ifdef DEBUG
 			printf("\tError\n\r");
-			#endif
 			return AT_ERROR;
 	}
+#else 
+	return WaitOK();
+#endif
 }
+
+
+/* @} *

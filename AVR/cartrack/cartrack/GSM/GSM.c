@@ -3,7 +3,7 @@
  *  Date Created: Sun 15 Jun 2014 12:15:12 BST by seblovett on seblovett-Ubuntu
  *  <+Last Edited: Sun 15 Jun 2014 12:16:17 BST by seblovett on seblovett-Ubuntu +>
  *  @author seblovett
- *  @brief ...
+ *  @brief Encompassing functions to run the higher level aspects of the GSM modem.
  */
 
 #include "GSM.h"
@@ -42,48 +42,62 @@ uint8_t GSM_Init(void)
 	
 }
 
+/** @brief Checks if the GSM modem is on or off
+ *	Result is stored in the GSM_t.status
+ */
+void GSM_CheckOn()
+{
+	switch (AT_OK())
+	{
+		case AT_SUCCESS:
+			//set the bit
+			gsm.status |= GSM_STATUS_POWER;
+			break;
+		default:
+			//clear the bit
+			gsm.status &= ~(GSM_STATUS_POWER);
+			break;
+	}
+}
+
+/** @brief Runs regular functions needed.
+ *  retval - 0 okay, > 0 error
+ *  Runs the ParseReceived() function.
+ *  Also sends an AT command to ensure the GSM is still working error free. 
+ *	Any errors found here are stored in the GSM_t struct.
+ */
 uint8_t GSM_Proc(void)
 {
 	//uint8_t c = Circ_Read_Char();
-	Dump_Buf();
-	return 0;
+	return ParseReceived();
+	//Dump_Buf();
+	//return 0;
 }
 
+
+/** @brief Calls all AT commands to set up the GPRS functionality
+  */
 void GPRS_Setup()
 {
 	AT_QIREGAPP();
-// 	Dump_Buf();
-// 	printf("\n\r");
 	_delay_ms(1000);
 	AT_QIACT();
-// 	Dump_Buf();
-// 	printf("\n\r");
 	_delay_ms(1000);
 	AT_CGATT(1);
-// 	Dump_Buf();
-// 	printf("\n\r");
 	_delay_ms(1000);
 	//AT_QILOCIP();
 	AT_QIFGCNT(0);
-// 	Dump_Buf();
-// 	printf("\n\r");
 	_delay_ms(1000);
-	//AT_QICSGP();
 	AT_QIDNSIP(1);
-// 	Dump_Buf();
-// 	printf("\n\r");
 	_delay_ms(1000);
 	AT_QISHOWRA(1);
-// 	Dump_Buf();
-// 	printf("\n\r");
 	_delay_ms(1000);
-// 	for(uint8_t i = 0; i < CIRBUF_SIZE; i++)
-// 		circBuf.Buffer[i] = 0;
-// 	circBuf.ReadPtr = 0;
-// 	circBuf.WritePtr = 0;
-	
 }
 
+
+/** @brief Calls functions needed to submit data to the website
+ *	@todo - need to put actual data sending in here
+ */
 void GPRS_Send(void)
 {
 	AT_QIOPEN();

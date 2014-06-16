@@ -11,9 +11,10 @@
 #define AT_H_
 
 
-#define AT_TIMEOUT	1
-#define AT_SUCCESS	0
-#define AT_ERROR	2
+
+#define AT_SUCCESS	0	//! AT command was successful
+#define AT_TIMEOUT	1	//! AT command has timed out
+#define AT_ERROR	2	//! AT command returned error
 
 uint8_t AT_OK(void);
 uint8_t ATE(uint8_t Echo);
@@ -30,4 +31,5 @@ uint8_t AT_QILOCIP(void);
 uint8_t AT_QIACT(void);
 uint8_t AT_QISEND(void);
 uint8_t AT_QIOPEN(void);
+uint8_t ParseReceived(void);
 #endif /* AT_H_ */
