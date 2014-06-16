@@ -873,7 +873,7 @@ uint8_t AT_QISEND(void)
 {
 
 #ifdef DEBUG
-	printf("Sending AT+QISEND=\"TCP\",\"www.seblovett.co.uk\",80");
+	printf("Sending AT+QISEND + HTTP Packet");
 #endif
 	Interface_SendString("AT+QISEND\r");//GET /submit.php?id=1&mb_fan_cpu=1000 HTTP/1.1\r\nHost: www.seblovett.co.uk\n\rConnection:close\r\n\n");
 	_delay_ms(1000);
@@ -901,4 +901,4 @@ uint8_t AT_QISEND(void)
 }
 
 
-/* @} *
+/* @} */
