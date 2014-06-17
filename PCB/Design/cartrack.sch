@@ -134,7 +134,6 @@
 <wire x1="15.24" y1="14.605" x2="15.24" y2="-14.605" width="0.127" layer="51"/>
 <wire x1="15.24" y1="-14.605" x2="-13.97" y2="-14.605" width="0.127" layer="51"/>
 <wire x1="-13.97" y1="-14.605" x2="-13.97" y2="14.605" width="0.127" layer="51"/>
-<circle x="10.5" y="5.51" radius="2.5" width="0.127" layer="18"/>
 <smd name="DISP_DATA" x="-13.9" y="12.65" dx="2.2" dy="0.9" layer="1"/>
 <smd name="DISP_CLK" x="-13.9" y="11.35" dx="2.2" dy="0.9" layer="1"/>
 <smd name="DISP_CS" x="-13.9" y="10.05" dx="2.2" dy="0.9" layer="1"/>
@@ -199,6 +198,11 @@
 <smd name="KBR2" x="7.75" y="-14.45" dx="2.2" dy="0.9" layer="1" rot="R270"/>
 <smd name="KBR4" x="10.35" y="-14.45" dx="2.2" dy="0.9" layer="1" rot="R270"/>
 <smd name="KBR3" x="9.05" y="-14.45" dx="2.2" dy="0.9" layer="1" rot="R270"/>
+<circle x="10.4902" y="5.5118" radius="2.5" width="0" layer="41"/>
+<circle x="10.4902" y="5.5118" radius="2.5" width="0" layer="42"/>
+<circle x="10.4902" y="5.5118" radius="2.5" width="0" layer="39"/>
+<circle x="10.4902" y="5.5118" radius="2.5" width="0" layer="40"/>
+<circle x="10.4902" y="5.5118" radius="2.5" width="0" layer="43"/>
 </package>
 </packages>
 <symbols>
@@ -19394,17 +19398,6 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <library name="misc">
 <packages>
 <package name="LM2941">
-<polygon width="0.127" layer="1">
-<vertex x="0" y="0"/>
-<vertex x="0" y="4.2"/>
-<vertex x="-5.1" y="4.2"/>
-<vertex x="-5.1" y="5.4"/>
-<vertex x="-7" y="5.4"/>
-<vertex x="-7" y="-5.4"/>
-<vertex x="-5.1" y="-5.4"/>
-<vertex x="-5.1" y="-4.2"/>
-<vertex x="0" y="-4.2"/>
-</polygon>
 <smd name="GND" x="7" y="0" dx="2.1844" dy="1.0668" layer="1"/>
 <smd name="VIN" x="7" y="1.7" dx="2.1844" dy="1.0668" layer="1"/>
 <smd name="VOUT" x="7" y="3.4" dx="2.1844" dy="1.0668" layer="1"/>
@@ -19419,7 +19412,18 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <wire x1="1" y1="-6" x2="-8" y2="-6" width="0.127" layer="21"/>
 <wire x1="-8" y1="-6" x2="-8" y2="6" width="0.127" layer="21"/>
 <text x="-8.3" y="-6.1" size="1.27" layer="25" rot="R90">&gt;NAME</text>
-<smd name="TAB" x="-6" y="0" dx="2.1844" dy="1.0668" layer="1"/>
+<smd name="TAB" x="-5.5" y="0" dx="2.1844" dy="1.0668" layer="1"/>
+<polygon width="0.127" layer="1">
+<vertex x="0" y="-4.2"/>
+<vertex x="0" y="4.2"/>
+<vertex x="-5.1" y="4.2"/>
+<vertex x="-5.1" y="5.4"/>
+<vertex x="-7" y="5.4"/>
+<vertex x="-7" y="-5.4"/>
+<vertex x="-5.1" y="-5.4"/>
+<vertex x="-5.1" y="-4.2"/>
+<vertex x="-0.1" y="-4.2"/>
+</polygon>
 </package>
 </packages>
 <symbols>
