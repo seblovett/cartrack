@@ -8,12 +8,12 @@ Desktop="Desktop"
 [Globals]
 AutoSaveProject=1
 UsedLibrary="/home/seblovett/Documents/cartrack/PCB/lbr/adafruit.lbr"
-UsedLibrary="/home/seblovett/Documents/cartrack/PCB/lbr/quectelm10.lbr"
 UsedLibrary="/home/seblovett/Documents/cartrack/PCB/lbr/misc.lbr"
+UsedLibrary="/home/seblovett/Documents/cartrack/PCB/lbr/quectelm10.lbr"
 
 [Win_1]
 Type="Schematic Editor"
-Loc="0 0 599 399"
+Loc="65 24 664 423"
 State=1
 Number=1
 File="cartrack.sch"
@@ -107,7 +107,7 @@ Layer=16
 
 [Win_3]
 Type="Control Panel"
-Loc="0 0 1025 399"
+Loc="65 24 1090 423"
 State=1
 Number=0
 
